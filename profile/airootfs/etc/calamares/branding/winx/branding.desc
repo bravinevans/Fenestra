@@ -1,0 +1,34 @@
+---
+componentName: winx
+welcomeStyleCalamares: false
+welcomeExpandingLogo: true
+windowExpanding: normal
+windowSize: 850px,560px
+windowPlacement: center
+
+strings:
+  productName:         WinX OS
+  shortProductName:    WinX
+  version:             2026.11
+  shortVersion:        2026.11
+  versionedName:       WinX OS 2026.11
+  shortVersionedName:  WinX 2026.11
+  bootloaderEntryName: WinX OS
+  productUrl:          https://github.com/bravinevans/Winx
+  supportUrl:          https://github.com/bravinevans/Winx/issues
+  knownIssuesUrl:      https://github.com/bravinevans/Winx/issues
+  releaseNotesUrl:     https://github.com/bravinevans/Winx/releases
+
+images:
+  productLogo:         "winx-logo.svg"
+  productIcon:         "winx-logo.svg"
+  productWelcome:      "welcome.svg"
+
+style:
+  SidebarBackground:        "#111827"
+  SidebarText:              "#F3F4F6"
+  SidebarTextCurrent:       "#FFFFFF"
+  SidebarBackgroundCurrent: "#0078D4"
+
+slideshow: "show.qml"
+slideshowAPI: 2
