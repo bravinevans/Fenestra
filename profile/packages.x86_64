@@ -3,5 +3,8 @@ linux-zen
 linux-zen-headers
 linux-firmware
 networkmanager
+syslinux
+grub
+efibootmgr
 sudo
 vim
