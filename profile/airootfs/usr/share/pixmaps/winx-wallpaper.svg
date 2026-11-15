@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080">
+  <defs>
+    <radialGradient id="bgGlow" cx="52%" cy="48%" r="65%">
+      <stop offset="0%" stop-color="#0B2A59" />
+      <stop offset="55%" stop-color="#061530" />
+      <stop offset="100%" stop-color="#030917" />
+    </radialGradient>
+    <linearGradient id="waveFront" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0078D4" />
+      <stop offset="50%" stop-color="#00A4EF" />
+      <stop offset="100%" stop-color="#005A9E" />
+    </linearGradient>
+    <linearGradient id="waveMid" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1E40AF" stop-opacity="0.85" />
+      <stop offset="100%" stop-color="#0284C7" stop-opacity="0.65" />
+    </linearGradient>
+    <linearGradient id="waveBack" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#172554" stop-opacity="0.7" />
+      <stop offset="100%" stop-color="#0369A1" stop-opacity="0.4" />
+    </linearGradient>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#bgGlow)" />
+  <path d="M 380,820 C 520,380 1120,180 1480,460 C 1660,600 1540,880 1240,940 C 920,1000 580,960 380,820 Z" fill="url(#waveBack)" />
+  <path d="M 460,760 C 640,340 1240,260 1440,560 C 1580,770 1320,960 980,930 C 700,905 520,860 460,760 Z" fill="url(#waveMid)" />
+  <path d="M 560,690 C 740,370 1260,360 1380,620 C 1470,810 1180,920 890,870 C 670,830 580,770 560,690 Z" fill="url(#waveFront)" />
+</svg>
