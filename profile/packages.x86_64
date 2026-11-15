@@ -65,24 +65,6 @@ ttf-liberation
 noto-fonts
 noto-fonts-emoji
 
-[options]
-HoldPkg     = pacman glibc
-Architecture = auto
-Color
-CheckSpace
-ParallelDownloads = 5
-SigLevel    = Required DatabaseOptional
-LocalFileSigLevel = Optional
-
-[core]
-Include = /etc/pacman.d/mirrorlist
-
-[extra]
-Include = /etc/pacman.d/mirrorlist
-
-[multilib]
-Include = /etc/pacman.d/mirrorlist
-
-[chaotic-aur]
-SigLevel = Never
-Server = https://cdn-mirror.chaotic.cx/$repo/$arch
+# Boot Splash & Graphical SSD Installer
+plymouth
+calamares
