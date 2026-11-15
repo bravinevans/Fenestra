@@ -1,26 +1,30 @@
 #!/usr/bin/env bash
 
-# Only run once per user
 MARKER="$HOME/.config/.winx-initialized"
 [ -f "$MARKER" ] && exit 0
 
-# 1. Enforce Windows double-click behavior in Plasma & Dolphin
+# 1. Windows double-click behavior & clean fonts
 kwriteconfig6 --file kdeglobals --group KDE --key SingleClick false
-
-# 2. Set clean Windows-metric fonts (Liberation Sans / Noto)
 kwriteconfig6 --file kdeglobals --group General --key font "Liberation Sans,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
 kwriteconfig6 --file kdeglobals --group General --key fixed "Noto Sans Mono,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
 
-# 3. Configure bottom taskbar height (44px) via Plasma scripting
+# 2. Bottom taskbar (44px) with custom WinX Start icon
 qdbus6 org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript '
 var panels = panels();
 for (var i = 0; i < panels.length; i++) {
     panels[i].location = "bottom";
     panels[i].height = 44;
+    var widgets = panels[i].widgets();
+    for (var j = 0; j < widgets.length; j++) {
+        if (widgets[j].type == "org.kde.plasma.kickoff") {
+            widgets[j].currentConfigGroup = ["General"];
+            widgets[j].writeConfig("icon", "/usr/share/pixmaps/winx-logo.svg");
+        }
+    }
 }
 '
 
-# 4. Configure Office suite to use the MS Office Tabbed Ribbon UI by default
+# 3. Office suite Tabbed Ribbon UI by default
 mkdir -p "$HOME/.config/libreoffice/4/user"
 cat << 'EOF' > "$HOME/.config/libreoffice/4/user/registrymodifications.xcu"
 <?xml version="1.0" encoding="UTF-8"?>
@@ -31,8 +35,9 @@ cat << 'EOF' > "$HOME/.config/libreoffice/4/user/registrymodifications.xcu"
 </oor:items>
 EOF
 
-# 5. Add Desktop shortcuts for Steam and Office
+# 4. Desktop shortcuts: Installer, Steam, Word, Excel, PowerPoint
 mkdir -p "$HOME/Desktop"
+cp -f /usr/share/applications/calamares.desktop "$HOME/Desktop/Install-WinX.desktop" 2>/dev/null || true
 cp -f /usr/share/applications/steam.desktop "$HOME/Desktop/" 2>/dev/null || true
 cp -f /usr/share/applications/libreoffice-writer.desktop "$HOME/Desktop/Word.desktop" 2>/dev/null || true
 cp -f /usr/share/applications/libreoffice-calc.desktop "$HOME/Desktop/Excel.desktop" 2>/dev/null || true
