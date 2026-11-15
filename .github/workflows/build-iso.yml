@@ -19,7 +19,7 @@ jobs:
           pacman-key --init
           pacman-key --populate archlinux
           pacman -Sy --noconfirm archlinux-keyring
-          pacman -Syu --noconfirm archiso grub git squashfs-tools libisoburn dosfstools mtools
+          pacman -Syu --noconfirm archiso grub git squashfs-tools libisoburn dosfstools mtools librsvg
 
       - name: Prepare build profile and airootfs overlay
         run: |
@@ -29,12 +29,18 @@ jobs:
           cp -f profile/profiledef.sh /tmp/build-profile/profiledef.sh
           cp -rf profile/airootfs/* /tmp/build-profile/airootfs/
 
-          # Enable SDDM display manager and NetworkManager on boot
+          # Render WinX SVG logo into PNG for Plymouth boot splash
+          mkdir -p /tmp/build-profile/airootfs/usr/share/plymouth/themes/spinner
+          rsvg-convert -w 128 -h 128 profile/airootfs/usr/share/pixmaps/winx-logo.svg -o /tmp/build-profile/airootfs/usr/share/plymouth/themes/spinner/watermark.png
+
+          # Enable Plymouth quiet splash in GRUB and Syslinux boot configs
+          sed -i 's/archisosearchuuid=%ARCHISO_UUID%/archisosearchuuid=%ARCHISO_UUID% quiet splash/g' /tmp/build-profile/grub/grub.cfg
+          sed -i 's/archisosearchuuid=%ARCHISO_UUID%/archisosearchuuid=%ARCHISO_UUID% quiet splash/g' /tmp/build-profile/syslinux/*.cfg
+
+          # Enable SDDM and NetworkManager on boot
           mkdir -p /tmp/build-profile/airootfs/etc/systemd/system/multi-user.target.wants
           ln -sf /usr/lib/systemd/system/sddm.service /tmp/build-profile/airootfs/etc/systemd/system/display-manager.service
           ln -sf /usr/lib/systemd/system/NetworkManager.service /tmp/build-profile/airootfs/etc/systemd/system/multi-user.target.wants/NetworkManager.service
-
-          # Ensure home directory ownership for live user winx (UID 1000)
           mkdir -p /tmp/build-profile/airootfs/home/winx
 
       - name: Build ISO
