@@ -40,6 +40,7 @@ jobs:
           cp -f profile/packages.x86_64 /tmp/build-profile/packages.x86_64
           cp -f profile/profiledef.sh /tmp/build-profile/profiledef.sh
           cp -rf profile/airootfs/* /tmp/build-profile/airootfs/
+          cp -f profile/airootfs/usr/share/pixmaps/winx-logo.svg /tmp/build-profile/airootfs/etc/calamares/branding/winx/winx-logo.svg
 
           # Render WinX SVG logo into a non-conflicting PNG path
           rsvg-convert -w 128 -h 128 profile/airootfs/usr/share/pixmaps/winx-logo.svg -o /tmp/build-profile/airootfs/usr/share/pixmaps/winx-watermark.png
