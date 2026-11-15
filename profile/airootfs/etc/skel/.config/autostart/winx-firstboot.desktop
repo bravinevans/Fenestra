@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=WinX First Boot Layout
+Exec=/usr/local/bin/winx-setup-desktop.sh
+OnlyShowIn=KDE;
+X-KDE-AutostartPhase=1
