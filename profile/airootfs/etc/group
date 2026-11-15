@@ -1,0 +1,6 @@
+root:x:0:root
+wheel:x:10:winx
+audio:x:995:winx
+video:x:986:winx
+input:x:994:winx
+winx:x:1000:
