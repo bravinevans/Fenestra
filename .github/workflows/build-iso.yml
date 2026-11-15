@@ -14,8 +14,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install archiso and dependencies
+      - name: Initialize Arch keyring and install archiso
         run: |
+          pacman-key --init
+          pacman-key --populate archlinux
+          pacman -Sy --noconfirm archlinux-keyring
           pacman -Syu --noconfirm archiso git squashfs-tools libisoburn dosfstools mtools
 
       - name: Prepare build profile
