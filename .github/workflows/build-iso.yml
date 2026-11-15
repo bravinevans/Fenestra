@@ -1,0 +1,37 @@
+name: Build WinX OS ISO
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:latest
+      options: --privileged
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install archiso and dependencies
+        run: |
+          pacman -Syu --noconfirm archiso git squashfs-tools libisoburn dosfstools mtools
+
+      - name: Prepare build profile
+        run: |
+          cp -r /usr/share/archiso/configs/releng /tmp/build-profile
+          cp -f profile/packages.x86_64 /tmp/build-profile/packages.x86_64
+          cp -f profile/profiledef.sh /tmp/build-profile/profiledef.sh
+
+      - name: Build ISO
+        run: |
+          mkdir -p /tmp/work /tmp/out
+          mkarchiso -v -w /tmp/work -o /tmp/out /tmp/build-profile
+
+      - name: Upload ISO Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: winx-os-iso
+          path: /tmp/out/*.iso
+          retention-days: 5
