@@ -35,13 +35,13 @@ cat << 'EOF' > "$HOME/.config/libreoffice/4/user/registrymodifications.xcu"
 </oor:items>
 EOF
 
-# 4. Desktop shortcuts: Installer, Steam, Word, Excel, PowerPoint
+# 4. Desktop shortcuts: Installer, Steam, WinX Word, WinX Excel, WinX PowerPoint
 mkdir -p "$HOME/Desktop"
 cp -f /usr/share/applications/calamares.desktop "$HOME/Desktop/Install-WinX.desktop" 2>/dev/null || true
 cp -f /usr/share/applications/steam.desktop "$HOME/Desktop/" 2>/dev/null || true
-cp -f /usr/share/applications/libreoffice-writer.desktop "$HOME/Desktop/Word.desktop" 2>/dev/null || true
-cp -f /usr/share/applications/libreoffice-calc.desktop "$HOME/Desktop/Excel.desktop" 2>/dev/null || true
-cp -f /usr/share/applications/libreoffice-impress.desktop "$HOME/Desktop/PowerPoint.desktop" 2>/dev/null || true
+cp -f /usr/local/share/applications/libreoffice-writer.desktop "$HOME/Desktop/WinX-Word.desktop" 2>/dev/null || true
+cp -f /usr/local/share/applications/libreoffice-calc.desktop "$HOME/Desktop/WinX-Excel.desktop" 2>/dev/null || true
+cp -f /usr/local/share/applications/libreoffice-impress.desktop "$HOME/Desktop/WinX-PowerPoint.desktop" 2>/dev/null || true
 chmod +x "$HOME/Desktop/"*.desktop 2>/dev/null || true
 
 touch "$MARKER"
