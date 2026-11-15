@@ -19,10 +19,5 @@ file_permissions=(
   ["/etc/sudoers.d/winx"]="0:0:440"
   ["/root"]="0:0:750"
   ["/usr/local/bin/winx-setup-desktop.sh"]="0:0:755"
-  ["/etc/shadow"]="0:0:400"
-  ["/etc/sudoers.d/winx"]="0:0:440"
-  ["/root"]="0:0:750"
-  ["/usr/local/bin/winx-setup-desktop.sh"]="0:0:755"
   ["/usr/local/bin/winx-console-session"]="0:0:755"
-)
 )
