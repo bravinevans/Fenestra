@@ -22,7 +22,7 @@ jobs:
           pacman-key --init
           pacman-key --populate archlinux
           pacman -Sy --noconfirm archlinux-keyring
-          pacman -Syu --noconfirm archiso grub git base-devel squashfs-tools libisoburn dosfstools mtools librsvg github-cli
+          pacman -Syu --noconfirm archiso grub git base-devel squashfs-tools libisoburn dosfstools mtools librsvg github-cli rclone
 
       - name: Build Calamares from AUR into local repo
         run: |
@@ -65,19 +65,31 @@ jobs:
           mkdir -p /tmp/work /tmp/out
           mkarchiso -v -w /tmp/work -o /tmp/out /tmp/build-profile
 
-      - name: Split ISO under 2GB and publish GitHub Release
+      - name: Upload single full ISO to Cloudflare R2 and publish Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RCLONE_CONFIG_R2_TYPE: s3
+          RCLONE_CONFIG_R2_PROVIDER: Cloudflare
+          RCLONE_CONFIG_R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          RCLONE_CONFIG_R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          RCLONE_CONFIG_R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+          RCLONE_CONFIG_R2_ACL: private
+          R2_PUBLIC_URL: ${{ secrets.R2_PUBLIC_URL }}
         run: |
           ISO_FILE=$(ls /tmp/out/*.iso | head -n 1)
           ISO_NAME=$(basename "$ISO_FILE")
           TAG="v$(date +%Y.%m.%d)-${{ github.run_number }}"
 
           mkdir -p /tmp/release
-          split -b 1900M -d --additional-suffix=.part "$ISO_FILE" "/tmp/release/${ISO_NAME}."
           sha256sum "$ISO_FILE" > "/tmp/release/${ISO_NAME}.sha256"
 
-          gh release create "$TAG" /tmp/release/* \
+          rclone copyto "$ISO_FILE" "r2:winx-os/${ISO_NAME}" --s3-no-check-bucket --progress
+          DIRECT_URL="${R2_PUBLIC_URL}/${ISO_NAME}"
+
+          gh release create "$TAG" "/tmp/release/${ISO_NAME}.sha256" \
             --repo "${{ github.repository }}" \
             --title "WinX OS ($TAG)" \
-            --notes "Reassemble on Linux with: \`cat ${ISO_NAME}.*.part > ${ISO_NAME}\` and verify with \`sha256sum -c ${ISO_NAME}.sha256\`"
+            --notes "### Direct Single-File ISO Download (2.7 GB)
+          - **Download ISO:** [Download ${ISO_NAME}](${DIRECT_URL})
+          - **CLI Resume Download:** \`aria2c -c -x 4 -s 4 ${DIRECT_URL}\`
+          - **Verify Checksum:** \`sha256sum -c ${ISO_NAME}.sha256\`"
