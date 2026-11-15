@@ -78,5 +78,6 @@ jobs:
           sha256sum "$ISO_FILE" > "/tmp/release/${ISO_NAME}.sha256"
 
           gh release create "$TAG" /tmp/release/* \
+            --repo "${{ github.repository }}" \
             --title "WinX OS ($TAG)" \
             --notes "Reassemble on Linux with: \`cat ${ISO_NAME}.*.part > ${ISO_NAME}\` and verify with \`sha256sum -c ${ISO_NAME}.sha256\`"
