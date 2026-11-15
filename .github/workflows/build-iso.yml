@@ -21,12 +21,21 @@ jobs:
           pacman -Sy --noconfirm archlinux-keyring
           pacman -Syu --noconfirm archiso grub git squashfs-tools libisoburn dosfstools mtools
 
-      - name: Prepare build profile
+      - name: Prepare build profile and airootfs overlay
         run: |
           cp -r /usr/share/archiso/configs/releng /tmp/build-profile
           cp -f profile/pacman.conf /tmp/build-profile/pacman.conf
           cp -f profile/packages.x86_64 /tmp/build-profile/packages.x86_64
           cp -f profile/profiledef.sh /tmp/build-profile/profiledef.sh
+          cp -rf profile/airootfs/* /tmp/build-profile/airootfs/
+
+          # Enable SDDM display manager and NetworkManager on boot
+          mkdir -p /tmp/build-profile/airootfs/etc/systemd/system/multi-user.target.wants
+          ln -sf /usr/lib/systemd/system/sddm.service /tmp/build-profile/airootfs/etc/systemd/system/display-manager.service
+          ln -sf /usr/lib/systemd/system/NetworkManager.service /tmp/build-profile/airootfs/etc/systemd/system/multi-user.target.wants/NetworkManager.service
+
+          # Ensure home directory ownership for live user winx (UID 1000)
+          mkdir -p /tmp/build-profile/airootfs/home/winx
 
       - name: Build ISO
         run: |
