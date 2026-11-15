@@ -14,12 +14,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Initialize Arch keyring and install archiso
+      - name: Initialize Arch keyring and install build tools
         run: |
           pacman-key --init
           pacman-key --populate archlinux
           pacman -Sy --noconfirm archlinux-keyring
-          pacman -Syu --noconfirm archiso grub git squashfs-tools libisoburn dosfstools mtools librsvg
+          pacman -Syu --noconfirm archiso grub git base-devel squashfs-tools libisoburn dosfstools mtools librsvg
+
+      - name: Build Calamares from AUR into local repo
+        run: |
+          useradd -m builder
+          echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+          su - builder -c "git clone https://aur.archlinux.org/calamares.git /tmp/calamares-aur && cd /tmp/calamares-aur && makepkg -s --noconfirm"
+          mkdir -p /tmp/localrepo
+          cp /tmp/calamares-aur/*.pkg.tar.zst /tmp/localrepo/
+          repo-add /tmp/localrepo/localrepo.db.tar.gz /tmp/localrepo/*.pkg.tar.zst
 
       - name: Prepare build profile and airootfs overlay
         run: |
