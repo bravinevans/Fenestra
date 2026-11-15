@@ -38,9 +38,13 @@ jobs:
           cp -f profile/profiledef.sh /tmp/build-profile/profiledef.sh
           cp -rf profile/airootfs/* /tmp/build-profile/airootfs/
 
-          # Render WinX SVG logo into PNG for Plymouth boot splash
-          mkdir -p /tmp/build-profile/airootfs/usr/share/plymouth/themes/spinner
-          rsvg-convert -w 128 -h 128 profile/airootfs/usr/share/pixmaps/winx-logo.svg -o /tmp/build-profile/airootfs/usr/share/plymouth/themes/spinner/watermark.png
+          # Render WinX SVG logo into a non-conflicting PNG path
+          rsvg-convert -w 128 -h 128 profile/airootfs/usr/share/pixmaps/winx-logo.svg -o /tmp/build-profile/airootfs/usr/share/pixmaps/winx-watermark.png
+
+          # Overwrite Plymouth's watermark AFTER pacman installs plymouth
+          cat << 'EOF' >> /tmp/build-profile/airootfs/root/customize_airootfs.sh
+          cp -f /usr/share/pixmaps/winx-watermark.png /usr/share/plymouth/themes/spinner/watermark.png
+          EOF
 
           # Enable Plymouth quiet splash in GRUB and Syslinux boot configs
           sed -i 's/archisosearchuuid=%ARCHISO_UUID%/archisosearchuuid=%ARCHISO_UUID% quiet splash/g' /tmp/build-profile/grub/grub.cfg
