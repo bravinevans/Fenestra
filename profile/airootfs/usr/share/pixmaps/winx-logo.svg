@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <linearGradient id="winxGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0078D4" />
+      <stop offset="100%" stop-color="#00BCF2" />
+    </linearGradient>
+  </defs>
+  <!-- Top Quadrant (forms upper V of negative-space X) -->
+  <polygon points="128,24 218,68 128,112 38,68" fill="url(#winxGrad)" />
+  <!-- Bottom Quadrant (forms lower inverted-V of negative-space X) -->
+  <polygon points="128,144 218,188 128,232 38,188" fill="url(#winxGrad)" />
+  <!-- Left Quadrant -->
+  <polygon points="24,82 112,128 24,174" fill="#0086F0" />
+  <!-- Right Quadrant -->
+  <polygon points="232,82 144,128 232,174" fill="#00A4EF" />
+</svg>
