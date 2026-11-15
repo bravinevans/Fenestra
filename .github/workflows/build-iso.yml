@@ -19,7 +19,7 @@ jobs:
           pacman-key --init
           pacman-key --populate archlinux
           pacman -Sy --noconfirm archlinux-keyring
-          pacman -Syu --noconfirm archiso git squashfs-tools libisoburn dosfstools mtools
+          pacman -Syu --noconfirm archiso grub git squashfs-tools libisoburn dosfstools mtools
 
       - name: Prepare build profile
         run: |
