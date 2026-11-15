@@ -3,13 +3,31 @@
 MARKER="$HOME/.config/.winx-initialized"
 [ -f "$MARKER" ] && exit 0
 
-# 1. Windows double-click behavior & clean fonts
+# 1. Dark Mode Global Theme, Windows double-click behavior & clean fonts
+lookandfeeltool -a org.kde.breezedark.desktop 2>/dev/null || true
+kwriteconfig6 --file kdeglobals --group General --key ColorScheme "BreezeDark"
 kwriteconfig6 --file kdeglobals --group KDE --key SingleClick false
 kwriteconfig6 --file kdeglobals --group General --key font "Liberation Sans,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
 kwriteconfig6 --file kdeglobals --group General --key fixed "Noto Sans Mono,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
 
-# 2. Bottom taskbar (44px) with custom WinX Start icon
+# 2. Desktop shortcuts: Installer, Steam, WinX Word, WinX Excel, WinX PowerPoint
+mkdir -p "$HOME/Desktop"
+cp -f /usr/share/applications/calamares.desktop "$HOME/Desktop/Install-WinX.desktop" 2>/dev/null || true
+cp -f /usr/share/applications/steam.desktop "$HOME/Desktop/" 2>/dev/null || true
+cp -f /usr/local/share/applications/libreoffice-writer.desktop "$HOME/Desktop/WinX-Word.desktop" 2>/dev/null || true
+cp -f /usr/local/share/applications/libreoffice-calc.desktop "$HOME/Desktop/WinX-Excel.desktop" 2>/dev/null || true
+cp -f /usr/local/share/applications/libreoffice-impress.desktop "$HOME/Desktop/WinX-PowerPoint.desktop" 2>/dev/null || true
+chmod +x "$HOME/Desktop/"*.desktop 2>/dev/null || true
+
+# 3. Bottom taskbar (44px), custom WinX Start icon, pinned apps & deep-blue wave wallpaper
 qdbus6 org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript '
+var allDesktops = desktops();
+for (var d = 0; d < allDesktops.length; d++) {
+    allDesktops[d].wallpaperPlugin = "org.kde.image";
+    allDesktops[d].currentConfigGroup = ["Wallpaper", "org.kde.image", "General"];
+    allDesktops[d].writeConfig("Image", "file:///usr/share/pixmaps/winx-wallpaper.svg");
+}
+
 var panels = panels();
 for (var i = 0; i < panels.length; i++) {
     panels[i].location = "bottom";
@@ -20,11 +38,21 @@ for (var i = 0; i < panels.length; i++) {
             widgets[j].currentConfigGroup = ["General"];
             widgets[j].writeConfig("icon", "/usr/share/pixmaps/winx-logo.svg");
         }
+        if (widgets[j].type == "org.kde.plasma.icontasks") {
+            widgets[j].currentConfigGroup = ["General"];
+            widgets[j].writeConfig("launchers", [
+                "applications:org.kde.dolphin.desktop",
+                "applications:steam.desktop",
+                "file:///usr/local/share/applications/libreoffice-writer.desktop",
+                "file:///usr/local/share/applications/libreoffice-calc.desktop",
+                "file:///usr/local/share/applications/libreoffice-impress.desktop"
+            ]);
+        }
     }
 }
 '
 
-# 3. Office suite Tabbed Ribbon UI by default
+# 4. Office suite Tabbed Ribbon UI by default
 mkdir -p "$HOME/.config/libreoffice/4/user"
 cat << 'EOF' > "$HOME/.config/libreoffice/4/user/registrymodifications.xcu"
 <?xml version="1.0" encoding="UTF-8"?>
@@ -34,14 +62,5 @@ cat << 'EOF' > "$HOME/.config/libreoffice/4/user/registrymodifications.xcu"
   <item oor:path="/org.openoffice.Office.UI.ToolbarMode/Applications/org.openoffice.Office.UI.ToolbarMode:Application['Impress']"><prop oor:name="Active" oor:op="fuse"><value>notebookbar_groupedbar_compact.ui</value></prop></item>
 </oor:items>
 EOF
-
-# 4. Desktop shortcuts: Installer, Steam, WinX Word, WinX Excel, WinX PowerPoint
-mkdir -p "$HOME/Desktop"
-cp -f /usr/share/applications/calamares.desktop "$HOME/Desktop/Install-WinX.desktop" 2>/dev/null || true
-cp -f /usr/share/applications/steam.desktop "$HOME/Desktop/" 2>/dev/null || true
-cp -f /usr/local/share/applications/libreoffice-writer.desktop "$HOME/Desktop/WinX-Word.desktop" 2>/dev/null || true
-cp -f /usr/local/share/applications/libreoffice-calc.desktop "$HOME/Desktop/WinX-Excel.desktop" 2>/dev/null || true
-cp -f /usr/local/share/applications/libreoffice-impress.desktop "$HOME/Desktop/WinX-PowerPoint.desktop" 2>/dev/null || true
-chmod +x "$HOME/Desktop/"*.desktop 2>/dev/null || true
 
 touch "$MARKER"
