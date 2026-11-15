@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+export XDG_CURRENT_DESKTOP=gamescope
+export STEAM_USE_DYNAMIC_VRS=1
+export RADV_PERFTEST=gpl
+
+# Launch Steam Deck UI inside Gamescope with HDR + Adaptive Sync (VRR)
+gamescope -e --hdr-enabled --adaptive-sync -- steam -gamepadui -steamos3
+
+# When user selects "Switch to Desktop" inside Steam, return to Plasma
+exec startplasma-wayland
