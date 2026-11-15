@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=WinX Console Mode (Steam Deck UI)
+Comment=Dedicated fullscreen gaming compositor with HDR and VRR
+Exec=/usr/local/bin/winx-console-session
+Type=Application
+DesktopNames=gamescope
