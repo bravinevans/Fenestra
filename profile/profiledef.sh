@@ -3,14 +3,12 @@
 
 iso_name="winx-os"
 iso_label="WINX_$(date --date="@${SOURCE_DATE_EPOCH:-$(date +%s)}" +%Y%m)"
-iso_publisher="WinX OS <https://github.com/bravinevans/winx-os>"
+iso_publisher="WinX OS <https://github.com/bravinevans/Winx>"
 iso_application="WinX OS Live/Install Media"
 iso_version="$(date --date="@${SOURCE_DATE_EPOCH:-$(date +%s)}" +%Y.%m.%d)"
 install_dir="arch"
 buildmodes=('iso')
-bootmodes=('bios.syslinux.mbr' 'bios.syslinux.eltorito'
-           'uefi-ia32.grub.esp' 'uefi-x64.grub.esp'
-           'uefi-ia32.grub.eltorito' 'uefi-x64.grub.eltorito')
+bootmodes=('bios.syslinux' 'uefi.grub')
 arch="x86_64"
 pacman_conf="pacman.conf"
 airootfs_image_type="squashfs"
