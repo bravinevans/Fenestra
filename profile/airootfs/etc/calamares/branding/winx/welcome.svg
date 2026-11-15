@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 200" width="640" height="200">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F172A" />
+      <stop offset="100%" stop-color="#1E293B" />
+    </linearGradient>
+    <linearGradient id="xGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0078D4" />
+      <stop offset="100%" stop-color="#00BCF2" />
+    </linearGradient>
+  </defs>
+  <rect width="640" height="200" rx="14" fill="url(#bgGrad)" />
+  <!-- Negative-space X Emblem -->
+  <g transform="translate(55, 36) scale(0.5)">
+    <polygon points="128,24 218,68 128,112 38,68" fill="url(#xGrad)" />
+    <polygon points="128,144 218,188 128,232 38,188" fill="url(#xGrad)" />
+    <polygon points="24,82 112,128 24,174" fill="#0086F0" />
+    <polygon points="232,82 144,128 232,174" fill="#00A4EF" />
+  </g>
+  <text x="210" y="96" font-family="sans-serif" font-weight="bold" font-size="38" fill="#FFFFFF">Welcome to WinX OS</text>
+  <text x="210" y="132" font-family="sans-serif" font-size="16" fill="#94A3B8">Familiar desktop. Console-grade gaming. Zero forced accounts.</text>
+</svg>
