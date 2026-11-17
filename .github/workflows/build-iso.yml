@@ -22,15 +22,16 @@ jobs:
           pacman-key --init
           pacman-key --populate archlinux
           pacman -Sy --noconfirm archlinux-keyring
-          pacman -Syu --noconfirm archiso grub git base-devel squashfs-tools libisoburn dosfstools mtools librsvg github-cli rclone
+          pacman -Syu --noconfirm archiso grub git base-devel squashfs-tools libisoburn dosfstools mtools librsvg github-cli rclone go
 
-      - name: Build Calamares from AUR into local repo
+      - name: Build Calamares and yay from AUR into local repo
         run: |
           useradd -m builder
           echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
           su - builder -c "git clone https://aur.archlinux.org/calamares.git /tmp/calamares-aur && cd /tmp/calamares-aur && makepkg -s --noconfirm"
+          su - builder -c "git clone https://aur.archlinux.org/yay-bin.git /tmp/yay-aur && cd /tmp/yay-aur && makepkg -s --noconfirm"
           mkdir -p /tmp/localrepo
-          cp /tmp/calamares-aur/*.pkg.tar.zst /tmp/localrepo/
+          cp /tmp/calamares-aur/*.pkg.tar.zst /tmp/yay-aur/*.pkg.tar.zst /tmp/localrepo/
           repo-add /tmp/localrepo/localrepo.db.tar.gz /tmp/localrepo/*.pkg.tar.zst
 
       - name: Prepare build profile and airootfs overlay
@@ -41,6 +42,15 @@ jobs:
           cp -f profile/profiledef.sh /tmp/build-profile/profiledef.sh
           cp -rf profile/airootfs/* /tmp/build-profile/airootfs/
           cp -f profile/airootfs/usr/share/pixmaps/winx-logo.svg /tmp/build-profile/airootfs/etc/calamares/branding/winx/winx-logo.svg
+          chmod +x /tmp/build-profile/airootfs/usr/local/bin/* 2>/dev/null || true
+
+          # Remove default linux.preset so mkinitcpio uses linux-zen.preset
+          rm -f /tmp/build-profile/airootfs/etc/mkinitcpio.d/linux.preset
+
+          # Point GRUB, Syslinux, and EFI boot configs to linux-zen and rebrand to WinX OS
+          sed -i 's/vmlinuz-linux\b/vmlinuz-linux-zen/g' /tmp/build-profile/grub/grub.cfg /tmp/build-profile/efiboot/loader/entries/*.conf /tmp/build-profile/syslinux/*.cfg
+          sed -i 's/initramfs-linux\.img/initramfs-linux-zen.img/g' /tmp/build-profile/grub/grub.cfg /tmp/build-profile/efiboot/loader/entries/*.conf /tmp/build-profile/syslinux/*.cfg
+          sed -i 's/Arch Linux/WinX OS/g' /tmp/build-profile/grub/grub.cfg /tmp/build-profile/efiboot/loader/entries/*.conf /tmp/build-profile/syslinux/*.cfg
 
           # Render WinX SVG logo into a non-conflicting PNG path
           rsvg-convert -w 128 -h 128 profile/airootfs/usr/share/pixmaps/winx-logo.svg -o /tmp/build-profile/airootfs/usr/share/pixmaps/winx-watermark.png
