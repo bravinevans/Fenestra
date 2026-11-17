@@ -1,12 +1,17 @@
-# Base System & Boot
+# Base System, Kernel, Microcode & Boot
 base
+base-devel
 linux-zen
 linux-zen-headers
 linux-firmware
+amd-ucode
+intel-ucode
+mkinitcpio
 networkmanager
 syslinux
 grub
 efibootmgr
+os-prober
 sudo
 vim
 git
@@ -35,7 +40,7 @@ pipewire-pulse
 pipewire-jack
 wireplumber
 
-# GPU Drivers (AMD, Intel, NVIDIA + 32-bit Vulkan for Steam/Proton)
+# Universal GPU Drivers (AMD, Intel, NVIDIA + 32-bit Vulkan for Steam/Proton)
 mesa
 lib32-mesa
 vulkan-radeon
@@ -59,12 +64,14 @@ lutris
 wine-staging
 winetricks
 
-# Office Suite (MS Office Ribbon Look-Alike Base) & Fonts
+# Office Suite (Ribbon Interface Base) & Fonts
 libreoffice-fresh
 ttf-liberation
 noto-fonts
 noto-fonts-emoji
 
-# Boot Splash & Graphical SSD Installer
+# Boot Splash, Graphical SSD Installer & WinX Store
 plymouth
 calamares
+yay-bin
+python-pyqt6
