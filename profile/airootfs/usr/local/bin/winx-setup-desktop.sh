@@ -10,9 +10,10 @@ kwriteconfig6 --file kdeglobals --group KDE --key SingleClick false
 kwriteconfig6 --file kdeglobals --group General --key font "Liberation Sans,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
 kwriteconfig6 --file kdeglobals --group General --key fixed "Noto Sans Mono,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
 
-# 2. Desktop shortcuts: Installer, Steam, WinX Word, WinX Excel, WinX PowerPoint
+# 2. Desktop shortcuts: Installer, WinX Store, Steam, WinX Word, WinX Excel, WinX PowerPoint
 mkdir -p "$HOME/Desktop"
 cp -f /usr/share/applications/calamares.desktop "$HOME/Desktop/Install-WinX.desktop" 2>/dev/null || true
+cp -f /usr/local/share/applications/winx-store.desktop "$HOME/Desktop/WinX-Store.desktop" 2>/dev/null || true
 cp -f /usr/share/applications/steam.desktop "$HOME/Desktop/" 2>/dev/null || true
 cp -f /usr/local/share/applications/libreoffice-writer.desktop "$HOME/Desktop/WinX-Word.desktop" 2>/dev/null || true
 cp -f /usr/local/share/applications/libreoffice-calc.desktop "$HOME/Desktop/WinX-Excel.desktop" 2>/dev/null || true
@@ -42,6 +43,7 @@ for (var i = 0; i < panels.length; i++) {
             widgets[j].currentConfigGroup = ["General"];
             widgets[j].writeConfig("launchers", [
                 "applications:org.kde.dolphin.desktop",
+                "file:///usr/local/share/applications/winx-store.desktop",
                 "applications:steam.desktop",
                 "file:///usr/local/share/applications/libreoffice-writer.desktop",
                 "file:///usr/local/share/applications/libreoffice-calc.desktop",
