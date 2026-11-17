@@ -1,0 +1,177 @@
+#!/usr/bin/env python3
+import json, subprocess, sys, urllib.parse, urllib.request
+from PyQt6.QtCore import Qt, QProcess
+from PyQt6.QtGui import QFont
+from PyQt6.QtWidgets import (
+    QApplication, QHBoxLayout, QLabel, QLineEdit, QListWidget,
+    QListWidgetItem, QMainWindow, QProgressBar, QPushButton,
+    QTextEdit, QVBoxLayout, QWidget
+)
+
+DARK_STYLE = """
+QMainWindow, QWidget { background-color: #0F172A; color: #F1F5F9; font-family: 'Liberation Sans', sans-serif; }
+QLineEdit { background-color: #1E293B; border: 1px solid #334155; border-radius: 6px; padding: 8px 12px; font-size: 14px; color: #FFFFFF; }
+QLineEdit:focus { border: 1px solid #0078D4; }
+QPushButton { background-color: #0078D4; color: #FFFFFF; border: none; border-radius: 6px; padding: 8px 16px; font-weight: bold; }
+QPushButton:hover { background-color: #0086F0; }
+QPushButton:disabled { background-color: #334155; color: #94A3B8; }
+QPushButton#UpdateBtn { background-color: #059669; }
+QPushButton#UpdateBtn:hover { background-color: #10B981; }
+QListWidget { background-color: #1E293B; border: 1px solid #334155; border-radius: 8px; padding: 4px; }
+QListWidget::item { padding: 10px; border-bottom: 1px solid #334155; }
+QListWidget::item:selected { background-color: #0078D4; border-radius: 4px; }
+QTextEdit { background-color: #090D16; color: #38BDF8; border: 1px solid #334155; border-radius: 6px; font-family: 'Noto Sans Mono', monospace; font-size: 12px; }
+QProgressBar { background-color: #1E293B; border-radius: 4px; height: 8px; text-align: center; }
+QProgressBar::chunk { background-color: #00BCF2; border-radius: 4px; }
+"""
+
+class WinXStore(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("WinX Store")
+        self.resize(860, 620)
+        self.proc = QProcess(self)
+        self.proc.setProcessChannelMode(QProcess.ProcessChannelMode.MergedChannels)
+        self.proc.readyReadStandardOutput.connect(self.on_output)
+        self.proc.finished.connect(self.on_finished)
+
+        root = QWidget()
+        self.setCentralWidget(root)
+        layout = QVBoxLayout(root)
+        layout.setSpacing(12)
+        layout.setContentsMargins(16, 16, 16, 16)
+
+        # Header + One-Click System Update
+        header = QHBoxLayout()
+        title = QLabel("WinX Store")
+        title.setFont(QFont("Liberation Sans", 18, QFont.Weight.Bold))
+        self.update_btn = QPushButton("Update System (pacman -Syu)")
+        self.update_btn.setObjectName("UpdateBtn")
+        self.update_btn.clicked.connect(self.run_system_update)
+        header.addWidget(title)
+        header.addStretch()
+        header.addWidget(self.update_btn)
+        layout.addLayout(header)
+
+        # Search Bar
+        search_row = QHBoxLayout()
+        self.search_input = QLineEdit()
+        self.search_input.setPlaceholderText("Search official repositories & AUR (e.g., vlc, brave-bin, obs-studio, discord)...")
+        self.search_input.returnPressed.connect(self.search_packages)
+        self.search_btn = QPushButton("Search")
+        self.search_btn.clicked.connect(self.search_packages)
+        search_row.addWidget(self.search_input)
+        search_row.addWidget(self.search_btn)
+        layout.addLayout(search_row)
+
+        # Package Results List
+        self.results_list = QListWidget()
+        layout.addWidget(self.results_list, stretch=3)
+
+        # Install Action Bar + Progress
+        action_row = QHBoxLayout()
+        self.status_label = QLabel("Ready — search any app or click Update System.")
+        self.install_btn = QPushButton("Install Selected")
+        self.install_btn.clicked.connect(self.install_selected)
+        action_row.addWidget(self.status_label)
+        action_row.addStretch()
+        action_row.addWidget(self.install_btn)
+        layout.addLayout(action_row)
+
+        self.progress = QProgressBar()
+        self.progress.setRange(0, 1)
+        layout.addWidget(self.progress)
+
+        # Real-Time Output Console
+        self.log_box = QTextEdit()
+        self.log_box.setReadOnly(True)
+        self.log_box.setPlaceholderText("Live package installation logs will stream here...")
+        layout.addWidget(self.log_box, stretch=2)
+
+    def search_packages(self):
+        query = self.search_input.text().strip()
+        if not query:
+            return
+        self.results_list.clear()
+        self.status_label.setText(f"Searching official repos & AUR for '{query}'...")
+        QApplication.processEvents()
+
+        # 1. Official Repo Search via pacman -Ss
+        try:
+            out = subprocess.check_output(["pacman", "-Ss", query], text=True, stderr=subprocess.DEVNULL)
+            lines = out.strip().splitlines()
+            for i in range(0, len(lines) - 1, 2):
+                pkg_header = lines[i].strip()
+                pkg_desc = lines[i + 1].strip()
+                pkg_name = pkg_header.split()[0].split("/")[-1]
+                item = QListWidgetItem(f"[Official] {pkg_header}\n    {pkg_desc}")
+                item.setData(Qt.ItemDataRole.UserRole, pkg_name)
+                self.results_list.addItem(item)
+        except Exception:
+            pass
+
+        # 2. Live AUR RPC Search
+        try:
+            url = f"https://aur.archlinux.org/rpc/v5/search/{urllib.parse.quote(query)}"
+            req = urllib.request.urlopen(url, timeout=6)
+            data = json.loads(req.read().decode("utf-8"))
+            for pkg in data.get("results", [])[:35]:
+                name = pkg.get("Name", "")
+                ver = pkg.get("Version", "")
+                desc = pkg.get("Description") or "AUR package"
+                item = QListWidgetItem(f"[AUR] {name} ({ver})\n    {desc}")
+                item.setData(Qt.ItemDataRole.UserRole, name)
+                self.results_list.addItem(item)
+        except Exception as e:
+            self.log_box.append(f"AUR search notice: {e}")
+
+        self.status_label.setText(f"Found {self.results_list.count()} packages for '{query}'.")
+
+    def start_task(self, label, cmd):
+        if self.proc.state() != QProcess.ProcessState.NotRunning:
+            return
+        self.log_box.clear()
+        self.status_label.setText(label)
+        self.install_btn.setEnabled(False)
+        self.update_btn.setEnabled(False)
+        self.progress.setRange(0, 0)  # Indeterminate live pulse
+        self.proc.start("bash", ["-c", cmd])
+
+    def install_selected(self):
+        current = self.results_list.currentItem()
+        if not current:
+            self.status_label.setText("Select a package from the list first.")
+            return
+        pkg = current.data(Qt.ItemDataRole.UserRole)
+        self.start_task(
+            f"Installing {pkg}...",
+            f"yay -S --noconfirm --needed {pkg}"
+        )
+
+    def run_system_update(self):
+        self.start_task(
+            "Updating system & AUR packages...",
+            "pkexec pacman -Syu --noconfirm && yay -Sua --noconfirm"
+        )
+
+    def on_output(self):
+        text = bytes(self.proc.readAllStandardOutput()).decode("utf-8", errors="replace")
+        self.log_box.insertPlainText(text)
+        self.log_box.ensureCursorVisible()
+
+    def on_finished(self, exit_code, _status):
+        self.progress.setRange(0, 1)
+        self.progress.setValue(1)
+        self.install_btn.setEnabled(True)
+        self.update_btn.setEnabled(True)
+        if exit_code == 0:
+            self.status_label.setText("Completed successfully!")
+        else:
+            self.status_label.setText(f"Task finished with exit code {exit_code}. Check logs below.")
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    app.setStyleSheet(DARK_STYLE)
+    win = WinXStore()
+    win.show()
+    sys.exit(app.exec())
