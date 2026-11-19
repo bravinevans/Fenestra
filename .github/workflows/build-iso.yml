@@ -37,15 +37,14 @@ jobs:
       - name: Prepare build profile and airootfs overlay
         run: |
           cp -r /usr/share/archiso/configs/releng /tmp/build-profile
+          rm -f /tmp/build-profile/airootfs/etc/mkinitcpio.conf.d/archiso.conf
+          rm -f /tmp/build-profile/airootfs/etc/mkinitcpio.d/linux.preset
           cp -f profile/pacman.conf /tmp/build-profile/pacman.conf
           cp -f profile/packages.x86_64 /tmp/build-profile/packages.x86_64
           cp -f profile/profiledef.sh /tmp/build-profile/profiledef.sh
           cp -rf profile/airootfs/* /tmp/build-profile/airootfs/
           cp -f profile/airootfs/usr/share/pixmaps/winx-logo.svg /tmp/build-profile/airootfs/etc/calamares/branding/winx/winx-logo.svg
           chmod +x /tmp/build-profile/airootfs/usr/local/bin/* 2>/dev/null || true
-
-          # Remove default linux.preset so mkinitcpio uses linux-zen.preset
-          rm -f /tmp/build-profile/airootfs/etc/mkinitcpio.d/linux.preset
 
           # Point GRUB, Syslinux, and EFI boot configs to linux-zen and rebrand to WinX OS
           sed -i 's/vmlinuz-linux\b/vmlinuz-linux-zen/g' /tmp/build-profile/grub/grub.cfg /tmp/build-profile/efiboot/loader/entries/*.conf /tmp/build-profile/syslinux/*.cfg
