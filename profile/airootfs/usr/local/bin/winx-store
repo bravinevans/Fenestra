@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import json, subprocess, sys, urllib.parse, urllib.request
+import json, shlex, subprocess, sys, urllib.parse, urllib.request
 from PyQt6.QtCore import Qt, QProcess
 from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import (
@@ -134,7 +134,7 @@ class WinXStore(QMainWindow):
         self.status_label.setText(label)
         self.install_btn.setEnabled(False)
         self.update_btn.setEnabled(False)
-        self.progress.setRange(0, 0)  # Indeterminate live pulse
+        self.progress.setRange(0, 0)
         self.proc.start("bash", ["-c", cmd])
 
     def install_selected(self):
@@ -143,15 +143,16 @@ class WinXStore(QMainWindow):
             self.status_label.setText("Select a package from the list first.")
             return
         pkg = current.data(Qt.ItemDataRole.UserRole)
+        safe_pkg = shlex.quote(pkg)
         self.start_task(
             f"Installing {pkg}...",
-            f"yay -S --noconfirm --needed {pkg}"
+            f"yay -S --noconfirm --needed {safe_pkg}"
         )
 
     def run_system_update(self):
         self.start_task(
             "Updating system & AUR packages...",
-            "pkexec pacman -Syu --noconfirm && yay -Sua --noconfirm"
+            "sudo pacman -Syu --noconfirm && yay -Sua --noconfirm"
         )
 
     def on_output(self):
