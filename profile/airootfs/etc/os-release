@@ -1,0 +1,8 @@
+NAME="WinX OS"
+PRETTY_NAME="WinX OS"
+ID=winx
+ID_LIKE=arch
+BUILD_ID=rolling
+ANSI_COLOR="38;2;0;120;212"
+HOME_URL="https://github.com/bravinevans/Winx"
+LOGO=winx-logo
