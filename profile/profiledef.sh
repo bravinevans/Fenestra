@@ -20,4 +20,5 @@ file_permissions=(
   ["/root"]="0:0:750"
   ["/usr/local/bin/winx-setup-desktop.sh"]="0:0:755"
   ["/usr/local/bin/winx-console-session"]="0:0:755"
+  ["/usr/local/bin/winx-store"]="0:0:755"
 )
